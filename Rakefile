@@ -4,7 +4,6 @@ require 'rubocop/rake_task'
 require 'yaml'
 require 'yardstick'
 
-# rubocop:disable Rails/RakeEnvironment
 desc('Documentation stats and measurements')
 task('qa:docs') do
   yaml = YAML.load_file(File.expand_path('../.yardstick.yml', __FILE__))
@@ -14,7 +13,6 @@ task('qa:docs') do
   coverage = Yardstick.round_percentage(measure.coverage * 100)
   exit(1) if coverage < config.threshold
 end
-# rubocop:enable Rails/RakeEnvironment
 
 desc('Codestyle check and linter')
 RuboCop::RakeTask.new('qa:code') do |task|
@@ -32,5 +30,5 @@ else
   task(qa: ['qa:docs', 'qa:code'])
 end
 
-RSpec::Core::RakeTask.new(:spec)
-task(default: %w[qa spec])
+RSpec::Core::RakeTask.new(spec: :qa)
+task(default: :spec)

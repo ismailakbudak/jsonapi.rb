@@ -34,6 +34,23 @@ RSpec.describe UsersController, type: :request do
         end
       end
 
+      context 'returns customers and full name' do
+        let(:params) do
+          { fields: { full_name: true } }
+        end
+
+        it do
+          expect(response).to have_http_status(:ok)
+          expect(response_json['data'].size).to eq(users.size)
+
+          response_json['data'].each do |item|
+            user = users.detect { |u| u.id == item['id'].to_i }
+            full_name = "#{user.first_name} #{user.last_name}"
+            expect(item).to have_attribute('full_name').with_value(full_name)
+          end
+        end
+      end
+
       context 'returns customers included and sparse fields' do
         let(:params) do
           {

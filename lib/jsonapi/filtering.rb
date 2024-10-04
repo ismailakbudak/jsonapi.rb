@@ -1,8 +1,5 @@
-begin
-  require 'ransack/predicate'
-  require_relative 'patches'
-rescue LoadError
-end
+require 'ransack/predicate'
+require_relative 'patches'
 
 # Filtering and sorting support
 module JSONAPI

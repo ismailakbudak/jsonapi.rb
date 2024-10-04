@@ -20,18 +20,13 @@ Gem::Specification.new do |spec|
   spec.files        += %w(LICENSE.txt README.md)
   spec.require_paths = ['lib']
 
-  spec.post_install_message = (
-    'Install manually `ransack` gem before using `JSONAPI::Filtering`!'
-  )
-
   spec.add_dependency 'jsonapi-serializer'
+  spec.add_dependency 'ransack'
   spec.add_dependency 'rack'
 
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'ransack'
-  spec.add_development_dependency 'railties', ENV['RAILS_VERSION']
-  spec.add_development_dependency 'activerecord', ENV['RAILS_VERSION']
-  spec.add_development_dependency 'sqlite3', '~> 1.7'
+  spec.add_development_dependency 'rails', ENV['RAILS_VERSION']
+  spec.add_development_dependency 'sqlite3', ENV['SQLITE3_VERSION']
   spec.add_development_dependency 'ffaker'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'rspec-rails'

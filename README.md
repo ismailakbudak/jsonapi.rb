@@ -39,7 +39,7 @@ The available features include:
    [sparse fields](https://jsonapi.org/format/#fetching-sparse-fieldsets))
  * [filtering](https://jsonapi.org/format/#fetching-filtering) and
    [sorting](https://jsonapi.org/format/#fetching-sorting) of the data
-   (powered by Ransack, soft-dependency)
+   (powered by Ransack)
  * [pagination](https://jsonapi.org/format/#fetching-pagination) support
 
 ## But how?
@@ -48,15 +48,6 @@ Mainly by leveraging [JSON:API Serializer](https://github.com/jsonapi-serializer
 and [Ransack](https://github.com/activerecord-hackery/ransack).
 
 Thanks to everyone who worked on these amazing projects!
-
-## Sponsors
-
-I'm grateful for the following companies for supporting this project!
-
-<p align="center">
-<a href="https://www.luneteyewear.com"><img src="https://user-images.githubusercontent.com/112147/136836142-2bfba96e-447f-4eb6-b137-2445aee81b37.png"/></a>
-</p>
-
 
 ## Installation
 
@@ -112,10 +103,20 @@ Please follow the
 [JSON:API Serializer guide](https://github.com/jsonapi-serializer/jsonapi-serializer#serializer-definition)
 on how to define a serializer.
 
-To provide a different naming scheme implement the `jsonapi_serializer_class`
+To provide a different naming scheme use `serializer_class` parameter or implement the `jsonapi_serializer_class`
 method in your resource or application controller.
 
-Here's an example:
+Here's an example for `serializer_class` parameter:
+```ruby
+class CustomNamingController < ActionController::Base
+   def index
+      render jsonapi: Model.all,
+             serializer_class: MySerializer
+   end
+end
+```
+
+Here's an example for `jsonapi_serializer_class` method:
 ```ruby
 class CustomNamingController < ActionController::Base
 
@@ -232,12 +233,6 @@ class MyController < ActionController::Base
 end
 ```
 
-This allows you to run queries like:
-
-```bash
-$ curl -X GET /api/resources?fields[model]=model_attr,relationship
-```
-
 ### Filtering and sorting
 
 `JSONAPI::Filtering` uses the power of
@@ -245,8 +240,6 @@ $ curl -X GET /api/resources?fields[model]=model_attr,relationship
 to filter and sort over a collection of records.
 The support is pretty extended and covers also relationships and composite
 matchers.
-
-Please add `ransack` to your `Gemfile` in order to benefit from this functionality!
 
 Here's an example:
 
@@ -281,7 +274,7 @@ grouping. To enable expressions along with filters, use the option flags:
 ```ruby
 options = { sort_with_expressions: true }
 jsonapi_filter(User.all, allowed_fields, options) do |filtered|
-  render jsonapi: filtered.result.group('id').to_a
+  render jsonapi: result.group('id').to_a
 end
 ```
 
@@ -304,7 +297,7 @@ class MyController < ActionController::Base
 
   def index
     jsonapi_paginate(Model.all) do |paginated|
-      render jsonapi: paginated
+      render jsonapi_paginate: paginated
     end
   end
 
@@ -331,7 +324,7 @@ If you want to change the default number of items per page or define a custom lo
 ```ruby
   def jsonapi_page_size(pagination_params)
     per_page = pagination_params[:size].to_f.to_i
-    per_page = 30 if per_page > 30 || per_page < 1
+    per_page = 30 if per_page > 30
     per_page
   end
 ```

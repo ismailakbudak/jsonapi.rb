@@ -12,15 +12,35 @@ module JSONAPI
     end
 
     attribute :code do |object|
-      object.type.to_s.delete("''").parameterize.tr('-', '_')
+      _, error_hash = object
+      code = error_hash[:error] unless error_hash[:error].is_a?(Hash)
+      code ||= error_hash[:message] || :invalid
+      # `parameterize` separator arguments are different on Rails 4 vs 5...
+      code.to_s.delete("''").parameterize.tr('-', '_')
     end
 
-    attribute :detail do |object, _params|
-      object.full_message
+    attribute :detail do |object, params|
+      error_key, error_hash = object
+      errors_object = params[:model].errors
+
+      # Rails 4 provides just the message.
+      if error_hash[:error].present? && error_hash[:error].is_a?(Hash)
+        message = errors_object.generate_message(
+          error_key, nil, error_hash[:error]
+        )
+      elsif error_hash[:error].present?
+        message = errors_object.generate_message(
+          error_key, error_hash[:error], error_hash
+        )
+      else
+        message = error_hash[:message]
+      end
+
+      errors_object.full_message(error_key, message)
     end
 
     attribute :source do |object, params|
-      error_key = object.attribute
+      error_key, _ = object
       model_serializer = params[:model_serializer]
       attrs = (model_serializer.attributes_to_serialize || {}).keys
       rels = (model_serializer.relationships_to_serialize || {}).keys

@@ -17,7 +17,7 @@ module JSONAPI
       end
 
       params[:fields].each do |k, v|
-        extracted[k] = v.to_s.split(',').filter_map(&:strip)
+        extracted[k] = v.to_s.split(',').map(&:strip).compact
       end
 
       extracted
@@ -29,7 +29,7 @@ module JSONAPI
     #
     # @return [Array]
     def jsonapi_include
-      params['include'].to_s.split(',').filter_map(&:strip)
+      params['include'].to_s.split(',').map(&:strip).compact
     end
   end
 end
